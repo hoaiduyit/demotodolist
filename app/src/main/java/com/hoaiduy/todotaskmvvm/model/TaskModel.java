@@ -27,6 +27,12 @@ public class TaskModel implements Serializable {
 
     }
 
+    public TaskModel(@Nullable String tittle, @Nullable String task, boolean complete) {
+        this.tittle = tittle;
+        this.task = task;
+        this.complete = complete;
+    }
+
     public TaskModel(@Nullable String tittle, boolean complete) {
         this.tittle = tittle;
         this.complete = complete;

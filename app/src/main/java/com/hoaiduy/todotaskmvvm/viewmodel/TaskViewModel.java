@@ -53,8 +53,8 @@ public class TaskViewModel {
         txtTask = (EditText) dialog.findViewById(R.id.txtTask);
         btnAddTask = (Button) dialog.findViewById(R.id.btnAddTask);
         btnAddTask.setOnClickListener(view -> {
-            stringTittle = txtTittle.getText().toString().substring(0, 1).toUpperCase();
-            stringTask = txtTask.getText().toString().substring(0, 1).toUpperCase();
+            stringTittle = txtTittle.getText().toString();
+            stringTask = txtTask.getText().toString();
             if (TextUtils.isEmpty(stringTittle) || TextUtils.isEmpty(stringTask)){
                 Toast.makeText(activity, "Empty...", Toast.LENGTH_LONG).show();
             }else {

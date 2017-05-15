@@ -32,6 +32,7 @@ public class TaskListActivity extends AppCompatActivity {
 
     private void initView() {
         ButterKnife.bind(this);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         taskViewModel.setupRecycleView(recyclerView);

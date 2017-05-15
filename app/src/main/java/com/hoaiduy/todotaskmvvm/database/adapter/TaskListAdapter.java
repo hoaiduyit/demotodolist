@@ -26,7 +26,7 @@ import butterknife.ButterKnife;
 
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHolder> {
 
-    private ArrayList<TaskModel> taskModels = new ArrayList<>();
+    private ArrayList<TaskModel> taskModels;
     private Activity activity;
     TaskDatabase taskDatabase;
 
@@ -45,9 +45,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
     public void onBindViewHolder(TaskHolder holder, int position) {
         TaskModel model = taskModels.get(position);
         holder.txtTittle.setText(model.getTittle());
+        holder.checkBox.setChecked(false);
         holder.txtTittle.setOnClickListener(view -> {
             Bundle bundle = new Bundle();
-            bundle.putInt("id", model.getId());
             bundle.putString("tittle", model.getTittle());
             bundle.putString("task", model.getTask());
             activity.startActivity(new Intent(activity, AddTaskActivity.class).putExtras(bundle));
@@ -57,6 +57,15 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
     @Override
     public int getItemCount() {
         return taskModels.size();
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    public void setData(ArrayList<TaskModel> modelArrayList){
+        this.taskModels = modelArrayList;
     }
 
     class TaskHolder extends RecyclerView.ViewHolder{

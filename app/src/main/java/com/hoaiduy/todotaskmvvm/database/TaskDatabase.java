@@ -19,7 +19,7 @@ import rx.functions.Func1;
  */
 
 public class TaskDatabase {
-    ArrayList<TaskModel> taskList;
+    private ArrayList<TaskModel> taskList;
 
     private static final String DATABASE_NAME = "TODO.db";
     private static final int DATABASE_VERSION = 1;
@@ -27,14 +27,14 @@ public class TaskDatabase {
     static final String DATABASE_CREATE = "create table "
             + "TaskList" + "(" + "id" + " integer primary key autoincrement," + "tittle text,task text,complete integer); ";
     private SQLiteDatabase sqLiteDatabase;
-    private final Context context;
+    private final Context mContext;
     private DatabaseHelper mHelper;
     @NonNull
     private Func1<Cursor, TaskModel> mTaskMapperFunction;
 
     public TaskDatabase(Context context){
-        this.context = context;
-        mHelper = new DatabaseHelper(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.mContext = context;
+        mHelper = new DatabaseHelper(mContext, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     public TaskDatabase open() throws SQLiteException{
@@ -82,11 +82,10 @@ public class TaskDatabase {
         taskList = new ArrayList<>();
         Cursor cursor = sqLiteDatabase.query("TaskList", null, "", null, null, null, null);
         while (cursor.moveToNext()){
-            int id = cursor.getInt(cursor.getColumnIndex("id"));
             String tittle = cursor.getString(cursor.getColumnIndex("tittle"));
             String task = cursor.getString(cursor.getColumnIndex("task"));
             boolean complete = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("complete")));
-            TaskModel taskModel = new TaskModel(id, tittle, task, complete);
+            TaskModel taskModel = new TaskModel(tittle, task, complete);
             taskList.add(taskModel);
         }
         cursor.close();
