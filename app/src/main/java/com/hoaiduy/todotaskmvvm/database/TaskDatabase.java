@@ -72,10 +72,14 @@ public class TaskDatabase {
         sqLiteDatabase.delete("TaskList", selection, selectionArgs);
     }
 
-    public void deleteTask(String taskId){
+    /*public int deleteTask(String taskId){
         String selection = "id" + " LIKE ?";
         String[] selectionArgs = {taskId};
-        sqLiteDatabase.delete("TaskList", selection, selectionArgs);
+        return sqLiteDatabase.delete("TaskList", selection, selectionArgs);
+    }*/
+
+    public int deleteTask(String tittle){
+        return sqLiteDatabase.delete("TaskList", "tittle= ?", new String[]{tittle});
     }
 
     public ArrayList<TaskModel> showTaskList(){

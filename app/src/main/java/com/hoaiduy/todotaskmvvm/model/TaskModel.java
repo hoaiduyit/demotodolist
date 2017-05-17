@@ -21,7 +21,7 @@ public class TaskModel implements Serializable {
     @Nullable
     private String task;
 
-    private boolean complete = false;
+    private boolean complete;
 
     public TaskModel(){
 
@@ -96,6 +96,6 @@ public class TaskModel implements Serializable {
 
     @Override
     public String toString() {
-        return "Task with title " + tittle;
+        return "Task with tittle " + tittle + " id= " + id;
     }
 }
