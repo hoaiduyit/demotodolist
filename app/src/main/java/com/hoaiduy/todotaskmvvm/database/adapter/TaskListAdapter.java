@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.StrikethroughSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,21 +23,27 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.functions.Action1;
 
 /**
  * Created by hoaiduy2503 on 5/15/2017.
  */
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHolder> {
+public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHolder> implements Action1<ArrayList<TaskModel>>{
 
     private ArrayList<TaskModel> taskModels;
-    private ArrayList<Object> listOfItemCompleted = new ArrayList<Object>();
     private Activity activity;
-    TaskDatabase taskDatabase;
+    private TaskDatabase taskDatabase;
 
     public TaskListAdapter(ArrayList<TaskModel> taskModel, Activity activity){
         this.taskModels = taskModel;
         this.activity = activity;
+    }
+
+    @Override
+    public void call(ArrayList<TaskModel> taskModels) {
+        this.taskModels = taskModels;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -48,27 +56,25 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
     public void onBindViewHolder(TaskHolder holder, int position) {
         TaskModel model = taskModels.get(position);
         holder.txtTittle.setText(model.getTittle());
-        holder.checkBox.setChecked(false);
+        holder.checkBox.setClickable(true);
+        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->  {
+            if (isChecked){
+                CharSequence tittle = model.getTittle();
+                SpannableString spannable = new SpannableString(model.getTittle());
+                spannable.setSpan(new StrikethroughSpan(), 0, tittle.length(), 0);
+                tittle = spannable;
+                model.isComplete();
+                holder.txtTittle.setText(tittle);
+            }else {
+                holder.txtTittle.setText(model.getTittle());
+            }
+        });
         holder.txtTittle.setOnClickListener(view -> {
             Bundle bundle = new Bundle();
             bundle.putString("tittle", model.getTittle());
             bundle.putString("task", model.getTask());
             activity.startActivity(new Intent(activity, AddTaskActivity.class).putExtras(bundle));
         });
-
-        holder.checkBox.setClickable(true);
-        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) ->  {
-            if (isChecked){
-                taskModels.get(position);
-                listOfItemCompleted.add(model.getTittle());
-                model.setComplete(true);
-            }else {
-                taskModels.remove(position);
-                listOfItemCompleted.remove(model.getTittle());
-                model.setComplete(false);
-            }
-        });
-
         holder.txtTittle.setOnLongClickListener(view -> {
             deleteTask(holder, position);
             return false;
