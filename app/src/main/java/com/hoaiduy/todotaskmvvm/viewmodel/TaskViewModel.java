@@ -1,80 +1,112 @@
 package com.hoaiduy.todotaskmvvm.viewmodel;
 
-import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import com.hoaiduy.todotaskmvvm.R;
 import com.hoaiduy.todotaskmvvm.database.TaskDatabase;
-import com.hoaiduy.todotaskmvvm.database.adapter.TaskListAdapter;
+import com.hoaiduy.todotaskmvvm.databinding.ActivityTaskBinding;
 import com.hoaiduy.todotaskmvvm.model.TaskModel;
+import com.hoaiduy.todotaskmvvm.view.adapter.TaskListAdapter;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+
 
 /**
  * Created by hoaiduy2503 on 5/15/2017.
  */
 
 public class TaskViewModel {
-    private Activity activity;
-    private ArrayList<TaskModel> taskModels = new ArrayList<>();
+    private Context mContext;
+    private List<TaskModel> taskModels = new ArrayList<>();
     private TaskListAdapter adapter;
     private TaskDatabase taskDatabase;
-    private EditText txtTittle, txtTask;
-    private Button btnAddTask;
     private String stringTittle, stringTask;
+    private TaskModel model = new TaskModel();
 
-    public TaskViewModel(Activity activity){
-        this.activity = activity;
+    public TaskViewModel(Context activity){
+        this.mContext = activity;
     }
 
     public void setupRecycleView(RecyclerView recyclerView){
-        taskDatabase = new TaskDatabase(activity);
+        taskDatabase = new TaskDatabase(mContext);
         taskDatabase = taskDatabase.open();
-        taskModels = taskDatabase.showTaskList();
-
-        adapter = new TaskListAdapter(taskModels, activity);
+        adapter = new TaskListAdapter(taskModels, mContext);
         recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        int id = model.getId();
+        getTask(id)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(taskModels1 -> {
+                        taskModels.addAll(taskModels1);
+                        adapter.notifyDataSetChanged();
+                });
     }
 
-    public void setupAddTask(RecyclerView recyclerView){
-        taskDatabase = new TaskDatabase(activity);
-        taskDatabase = taskDatabase.open();
+    //-----RxJava----
+    private Callable<List<TaskModel>> getAllTask(){
+        return () -> taskDatabase.showTaskList();
+    }
 
-        Dialog dialog = new Dialog(activity);
-        dialog.setContentView(R.layout.activity_task);
+    private static <T> Observable<T> makeObservable(final Callable<T> func) {
+        return Observable.create(
+                e -> {
+                    try {
+                        e.onNext(func.call());
+                        e.onComplete();
+                    } catch(Exception ex) {
+                        e.onError(ex);
+                    }
+                });
+    }
+
+    private Observable<List<TaskModel>> getTask(int id){
+        return makeObservable(getAllTask())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+    //-------------
+
+    public void setupAddTask(){
+        taskDatabase = new TaskDatabase(mContext);
+        taskDatabase = taskDatabase.open();
+        ActivityTaskBinding mBinding = DataBindingUtil.inflate(LayoutInflater
+                .from(mContext), R.layout.activity_task, null, false);
+
+        Dialog dialog = new Dialog(mContext);
+        dialog.setContentView(mBinding.getRoot());
         dialog.setTitle("Task Detail");
-        txtTittle = (EditText) dialog.findViewById(R.id.txtTittle);
-        txtTask = (EditText) dialog.findViewById(R.id.txtTask);
-        btnAddTask = (Button) dialog.findViewById(R.id.btnAddTask);
-        btnAddTask.setOnClickListener(view -> {
-            stringTittle = txtTittle.getText().toString();
-            stringTask = txtTask.getText().toString();
+
+        mBinding.btnAddTask.setOnClickListener(view -> {
+            stringTittle = mBinding.txtTittle.getText().toString();
+            stringTask = mBinding.txtTask.getText().toString();
             if (TextUtils.isEmpty(stringTittle) || TextUtils.isEmpty(stringTask)){
-                Toast.makeText(activity, "Empty...", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Empty...", Toast.LENGTH_LONG).show();
             }else {
-                TaskModel model = new TaskModel();
+                model = new TaskModel();
                 model.setTittle(stringTittle);
                 model.setTask(stringTask);
                 long result = taskDatabase.insertEntry(model);
                 if (result == -1){
-                    Toast.makeText(activity, "Failed to add task", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Failed to add task", Toast.LENGTH_LONG).show();
                 }else {
-                    Toast.makeText(activity, "Add task successful", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Add task successful", Toast.LENGTH_LONG).show();
                     taskModels.add(model);
-                    adapter = new TaskListAdapter(taskModels, activity);
-                    recyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                     dialog.dismiss();
                 }
             }
         });
         dialog.show();
-
     }
 }

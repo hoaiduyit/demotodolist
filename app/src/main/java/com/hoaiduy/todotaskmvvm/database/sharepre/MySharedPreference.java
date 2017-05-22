@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 
 public class MySharedPreference {
 
-    private static final String SHARED_NAME = "account";
     private static final String TITTLE_CODE = "tittle";
     private static final String TASK_CODE = "task";
     private SharedPreferences sharedPreferences;
@@ -17,7 +16,7 @@ public class MySharedPreference {
 
     public MySharedPreference(Context context){
         this.mContext = context;
-        sharedPreferences = context.getSharedPreferences(SHARED_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = context.getSharedPreferences(null, Context.MODE_PRIVATE);
     }
 
     public void saveCategoryCode(String tittle, String task){
