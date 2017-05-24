@@ -18,7 +18,7 @@
             android:layout_centerHorizontal="true"
             android:id="@+id/linearLayout">
             <EditText
-                android:id="@+id/txtTittle"
+                android:id="@+id/txtTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"

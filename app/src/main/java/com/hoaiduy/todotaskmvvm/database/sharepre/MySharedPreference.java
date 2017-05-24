@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 
 public class MySharedPreference {
 
-    private static final String TITTLE_CODE = "tittle";
+    private static final String TITLE_CODE = "title";
     private static final String TASK_CODE = "task";
     private SharedPreferences sharedPreferences;
     private Context mContext;
@@ -19,9 +19,9 @@ public class MySharedPreference {
         sharedPreferences = context.getSharedPreferences(null, Context.MODE_PRIVATE);
     }
 
-    public void saveCategoryCode(String tittle, String task){
+    public void saveTaskCode(String title, String task){
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(TITTLE_CODE, tittle);
+        editor.putString(TITLE_CODE, title);
         editor.putString(TASK_CODE, task);
         editor.apply();
     }

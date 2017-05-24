@@ -32,7 +32,7 @@ public class TaskViewModel {
     private List<TaskModel> taskModels = new ArrayList<>();
     private TaskListAdapter adapter;
     private TaskDatabase taskDatabase;
-    private String stringTittle, stringTask;
+    private String stringTitle, stringTask;
     private TaskModel model = new TaskModel();
 
     public TaskViewModel(Context activity){
@@ -44,12 +44,11 @@ public class TaskViewModel {
         taskDatabase = taskDatabase.open();
         adapter = new TaskListAdapter(taskModels, mContext);
         recyclerView.setAdapter(adapter);
-        int id = model.getId();
-        getTask(id)
+        makeObservable(getAllTask())
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(taskModels1 -> {
                         taskModels.addAll(taskModels1);
-                        adapter.notifyDataSetChanged();
                 });
     }
 
@@ -69,12 +68,6 @@ public class TaskViewModel {
                     }
                 });
     }
-
-    private Observable<List<TaskModel>> getTask(int id){
-        return makeObservable(getAllTask())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
     //-------------
 
     public void setupAddTask(){
@@ -88,19 +81,19 @@ public class TaskViewModel {
         dialog.setTitle("Task Detail");
 
         mBinding.btnAddTask.setOnClickListener(view -> {
-            stringTittle = mBinding.txtTittle.getText().toString();
+            stringTitle = mBinding.txtTitle.getText().toString();
             stringTask = mBinding.txtTask.getText().toString();
-            if (TextUtils.isEmpty(stringTittle) || TextUtils.isEmpty(stringTask)){
-                Toast.makeText(mContext, "Empty...", Toast.LENGTH_LONG).show();
+            if (TextUtils.isEmpty(stringTitle) || TextUtils.isEmpty(stringTask)){
+                Toast.makeText(mContext, "Empty...", Toast.LENGTH_SHORT).show();
             }else {
                 model = new TaskModel();
-                model.setTittle(stringTittle);
+                model.setTitle(stringTitle);
                 model.setTask(stringTask);
                 long result = taskDatabase.insertEntry(model);
                 if (result == -1){
-                    Toast.makeText(mContext, "Failed to add task", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Failed to add task", Toast.LENGTH_SHORT).show();
                 }else {
-                    Toast.makeText(mContext, "Add task successful", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Add task successful", Toast.LENGTH_SHORT).show();
                     taskModels.add(model);
                     adapter.notifyDataSetChanged();
                     dialog.dismiss();

@@ -23,8 +23,8 @@ public class SingleTaskViewModel extends BaseObservable {
         this.mContext = context;
     }
 
-    public String getTittle(){
-        return model.getTittle();
+    public String getTitle(){
+        return model.getTitle();
     }
 
     public String getTask(){
@@ -33,9 +33,8 @@ public class SingleTaskViewModel extends BaseObservable {
 
     public void onItemClick(View view){
         Bundle bundle = new Bundle();
-        bundle.putString("tittle", model.getTittle());
+        bundle.putString("title", model.getTitle());
         bundle.putString("task", model.getTask());
         mContext.startActivity(new Intent(mContext, AddTaskActivity.class).putExtras(bundle));
     }
-
 }

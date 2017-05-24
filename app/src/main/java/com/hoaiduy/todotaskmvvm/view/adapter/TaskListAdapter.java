@@ -54,15 +54,15 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
         dialogBuilder.setMessage("Do you want to delete this task?").setCancelable(false);
         dialogBuilder.setPositiveButton("Yes", (dialog, which) ->  {
             TaskModel model = taskModels.get(position);
-            String tittle = model.getTittle();
-            int delete = taskDatabase.deleteTask(tittle);
+            String title = model.getTitle();
+            int delete = taskDatabase.deleteTask(title);
             if (delete > 0) {
-                Toast.makeText(mContext, "Delete task successful", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Delete task successful", Toast.LENGTH_SHORT).show();
                 taskModels.remove(holder.getAdapterPosition());
                 notifyDataSetChanged();
                 dialog.dismiss();
             } else {
-                Toast.makeText(mContext, "Delete task failed", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, "Delete task failed", Toast.LENGTH_SHORT).show();
             }
         });
         dialogBuilder.setNegativeButton("No", (dialog, which) ->  {
@@ -106,9 +106,9 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
                     int id = position + 1;
                     finalTaskDatabase.updateIsComplete(String.valueOf(id));
                     notifyDataSetChanged();
-                    Toast.makeText(mContext, "Task is completed", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Task is completed", Toast.LENGTH_SHORT).show();
                 }else {
-                    Toast.makeText(mContext, "Task is activated", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Task is activated", Toast.LENGTH_SHORT).show();
                 }
             });
         }

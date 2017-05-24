@@ -23,7 +23,7 @@ public class TaskDatabase {
     private static final int DATABASE_VERSION = 1;
     static final String DATABASE_CREATE = "create table "
             + "TaskList" + "(" + "id" + " integer primary key autoincrement,"
-            + "tittle text,task text,complete integer not null default 0); ";
+            + "title text,task text,complete integer not null default 0); ";
     private SQLiteDatabase sqLiteDatabase;
     private final Context mContext;
     private DatabaseHelper mHelper;
@@ -48,14 +48,14 @@ public class TaskDatabase {
 
     public long insertEntry(TaskModel taskModel){
         ContentValues values = new ContentValues();
-        values.put("tittle", taskModel.getTittle());
+        values.put("title", taskModel.getTitle());
         values.put("task", taskModel.getTask());
 
         return sqLiteDatabase.insert("TaskList", null, values);
     }
 
-    public int deleteTask(String tittle){
-        return sqLiteDatabase.delete("TaskList", "tittle= ?", new String[]{tittle});
+    public int deleteTask(String title){
+        return sqLiteDatabase.delete("TaskList", "title= ?", new String[]{title});
     }
 
     public int updateIsComplete(String id){
@@ -69,10 +69,10 @@ public class TaskDatabase {
         Cursor cursor = sqLiteDatabase.query("TaskList", null, "", null, null, null, null);
         while (cursor.moveToNext()){
             int id = Integer.parseInt(cursor.getString(cursor.getColumnIndex("id")));
-            String tittle = cursor.getString(cursor.getColumnIndex("tittle"));
+            String title = cursor.getString(cursor.getColumnIndex("title"));
             String task = cursor.getString(cursor.getColumnIndex("task"));
             boolean complete = Boolean.parseBoolean(cursor.getString(cursor.getColumnIndex("complete")));
-            TaskModel taskModel = new TaskModel(id, tittle, task, complete);
+            TaskModel taskModel = new TaskModel(id, title, task, complete);
             taskList.add(taskModel);
         }
         cursor.close();

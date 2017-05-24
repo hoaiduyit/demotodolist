@@ -1,15 +1,18 @@
 package com.hoaiduy.todotaskmvvm.model;
 
-import java.io.Serializable;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+
+import com.hoaiduy.todotaskmvvm.BR;
 
 /**
  * Created by hoaiduy2503 on 5/12/2017.
  */
 
-public class TaskModel implements Serializable {
+public class TaskModel extends BaseObservable {
 
     private int id;
-    private String tittle;
+    private String title;
     private String task;
     private boolean complete;
 
@@ -17,13 +20,13 @@ public class TaskModel implements Serializable {
 
     }
 
-    public TaskModel(String tittle) {
-        this.tittle = tittle;
+    public TaskModel(String title) {
+        this.title = title;
     }
 
-    public TaskModel(int id, String tittle, String task, boolean complete) {
+    public TaskModel(int id, String title, String task, boolean complete) {
         this.id = id;
-        this.tittle = tittle;
+        this.title = title;
         this.task = task;
         this.complete = complete;
     }
@@ -32,10 +35,12 @@ public class TaskModel implements Serializable {
         return id;
     }
 
-    public String getTittle() {
-        return tittle;
+    @Bindable
+    public String getTitle() {
+        return title;
     }
 
+    @Bindable
     public String getTask() {
         return task;
     }
@@ -44,12 +49,14 @@ public class TaskModel implements Serializable {
         this.id = id;
     }
 
-    public void setTittle(String tittle) {
-        this.tittle = tittle;
+    public void setTitle(String title) {
+        this.title = title;
+        notifyPropertyChanged(BR.title);
     }
 
     public void setTask(String task) {
         this.task = task;
+        notifyPropertyChanged(BR.task);
     }
 
     public void setComplete(boolean complete) {
@@ -62,6 +69,6 @@ public class TaskModel implements Serializable {
 
     @Override
     public String toString() {
-        return "Task with tittle " + tittle + " id= " + id;
+        return "Task with title " + title + " id= " + id;
     }
 }

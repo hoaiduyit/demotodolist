@@ -32,17 +32,17 @@ public class Utils {
         return screenWidth;
     }
 
-    public static void setTittleDetail(CharSequence tittle, TextView txtTittle, Context context){
-        txtTittle.setText(tittle);
+    public static void setTittleDetail(CharSequence tittle, TextView txtTitle, Context context){
+        txtTitle.setText(tittle);
         int width = getScreenWidth(context);
 
         Rect bounds = new Rect();
-        Paint textPaint = txtTittle.getPaint();
-        textPaint.getTextBounds(txtTittle.getText().toString(), 0, txtTittle.getText().toString().length(), bounds);
+        Paint textPaint = txtTitle.getPaint();
+        textPaint.getTextBounds(txtTitle.getText().toString(), 0, txtTitle.getText().toString().length(), bounds);
         int widthText = bounds.width();
 
-        txtTittle.setGravity(Gravity.LEFT);
-        txtTittle.setWidth((int) (width / 2.0 + widthText / 2.0 - Utils.convertDpToPixel(72)));
+        txtTitle.setGravity(Gravity.LEFT);
+        txtTitle.setWidth((int) (width / 2.0 + widthText / 2.0 - Utils.convertDpToPixel(72)));
     }
 
     public static void setTaskDetail(CharSequence task, TextView txtTask, Context context){

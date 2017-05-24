@@ -16,7 +16,7 @@ import com.hoaiduy.todotaskmvvm.util.Utils;
 
 public class AddTaskActivity extends AppCompatActivity {
 
-    String tittle_key;
+    String title_key;
     String task_key;
     MySharedPreference preference;
 
@@ -26,12 +26,12 @@ public class AddTaskActivity extends AppCompatActivity {
         TaskItemDetailBinding mBinding = DataBindingUtil.setContentView(this, R.layout.task_item_detail);
 
         Bundle bundle = getIntent().getExtras();
-        tittle_key = bundle.getString("tittle");
+        title_key = bundle.getString("title");
         task_key = bundle.getString("task");
         preference = new MySharedPreference(this);
-        preference.saveCategoryCode(tittle_key, task_key);
+        preference.saveTaskCode(title_key, task_key);
 
-        Utils.setTittleDetail(tittle_key, mBinding.txtTit, this);
+        Utils.setTittleDetail(title_key, mBinding.txtTit, this);
         Utils.setTaskDetail(task_key, mBinding.txtTask, this);
     }
 }
