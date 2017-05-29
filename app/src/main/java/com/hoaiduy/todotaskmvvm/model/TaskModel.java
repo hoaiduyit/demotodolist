@@ -47,6 +47,7 @@ public class TaskModel extends BaseObservable {
 
     public void setId(int id) {
         this.id = id;
+        notifyPropertyChanged(id);
     }
 
     public void setTitle(String title) {

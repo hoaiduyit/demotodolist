@@ -20,6 +20,8 @@ import java.util.concurrent.Callable;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
@@ -34,6 +36,7 @@ public class TaskViewModel {
     private TaskDatabase taskDatabase;
     private String stringTitle, stringTask;
     private TaskModel model = new TaskModel();
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     public TaskViewModel(Context activity){
         this.mContext = activity;
@@ -44,6 +47,7 @@ public class TaskViewModel {
         taskDatabase = taskDatabase.open();
         adapter = new TaskListAdapter(taskModels, mContext);
         recyclerView.setAdapter(adapter);
+
         makeObservable(getAllTask())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -83,21 +87,31 @@ public class TaskViewModel {
         mBinding.btnAddTask.setOnClickListener(view -> {
             stringTitle = mBinding.txtTitle.getText().toString();
             stringTask = mBinding.txtTask.getText().toString();
-            if (TextUtils.isEmpty(stringTitle) || TextUtils.isEmpty(stringTask)){
-                Toast.makeText(mContext, "Empty...", Toast.LENGTH_SHORT).show();
-            }else {
-                model = new TaskModel();
+
+            Observable<Long> addNewTask = Observable.create(e -> {
                 model.setTitle(stringTitle);
                 model.setTask(stringTask);
-                long result = taskDatabase.insertEntry(model);
-                if (result == -1){
+                try{
+                    e.onNext(taskDatabase.insertEntry(model));
+                    e.onComplete();
+                }catch (Exception err){
                     Toast.makeText(mContext, "Failed to add task", Toast.LENGTH_SHORT).show();
-                }else {
-                    Toast.makeText(mContext, "Add task successful", Toast.LENGTH_SHORT).show();
-                    taskModels.add(model);
-                    adapter.notifyDataSetChanged();
-                    dialog.dismiss();
+                    e.onError(err);
                 }
+            });
+            if (TextUtils.isEmpty(stringTitle) || TextUtils.isEmpty(stringTask)) {
+                Toast.makeText(mContext, "Empty...", Toast.LENGTH_SHORT).show();
+            }else {
+                Disposable subscribe = addNewTask
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(aLong -> {
+                            Toast.makeText(mContext, "Add task successful", Toast.LENGTH_SHORT).show();
+                            taskModels.add(model);
+                            adapter.notifyDataSetChanged();
+                            dialog.dismiss();
+                        });
+                disposable.add(subscribe);
             }
         });
         dialog.show();

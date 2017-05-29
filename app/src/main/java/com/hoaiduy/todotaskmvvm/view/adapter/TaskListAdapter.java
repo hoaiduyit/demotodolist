@@ -18,6 +18,12 @@ import com.hoaiduy.todotaskmvvm.viewmodel.SingleTaskViewModel;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 /**
  * Created by hoaiduy2503 on 5/15/2017.
  */
@@ -28,6 +34,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
     private Context mContext;
     private TaskDatabase taskDatabase;
     private TaskItemBinding binding;
+    private CompositeDisposable disposable = new CompositeDisposable();
 
     public TaskListAdapter(List<TaskModel> modelList, Context context){
         this.taskModels = modelList;
@@ -53,17 +60,28 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskHo
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mContext);
         dialogBuilder.setMessage("Do you want to delete this task?").setCancelable(false);
         dialogBuilder.setPositiveButton("Yes", (dialog, which) ->  {
-            TaskModel model = taskModels.get(position);
-            String title = model.getTitle();
-            int delete = taskDatabase.deleteTask(title);
-            if (delete > 0) {
-                Toast.makeText(mContext, "Delete task successful", Toast.LENGTH_SHORT).show();
-                taskModels.remove(holder.getAdapterPosition());
-                notifyDataSetChanged();
-                dialog.dismiss();
-            } else {
-                Toast.makeText(mContext, "Delete task failed", Toast.LENGTH_SHORT).show();
-            }
+
+            Observable<Integer> deleteTask = Observable.create(e -> {
+                TaskModel model = taskModels.get(position);
+                String title = model.getTitle();
+                try {
+                    e.onNext(taskDatabase.deleteTask(title));
+                    e.onComplete();
+                }catch (Exception err){
+                    Toast.makeText(mContext, "Delete task failed", Toast.LENGTH_SHORT).show();
+                    e.onError(err);
+                }
+            });
+            Disposable subscribe = deleteTask
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(aInt -> {
+                        Toast.makeText(mContext, "Delete task successful", Toast.LENGTH_SHORT).show();
+                        taskModels.remove(holder.getAdapterPosition());
+                        notifyDataSetChanged();
+                        dialog.dismiss();
+                    });
+            disposable.add(subscribe);
         });
         dialogBuilder.setNegativeButton("No", (dialog, which) ->  {
            dialog.dismiss();
